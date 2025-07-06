@@ -1,0 +1,6 @@
+// Detect local account creation via script (This is done post USB plug-in because they impersonate legitimate HID (Human Interface Device) peripherals like keyboards or network adapters.)
+DeviceProcessEvents
+| where FileName == "net.exe"
+| where ProcessCommandLine contains "user" and ProcessCommandLine contains "add"
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine
+| order by Timestamp desc
