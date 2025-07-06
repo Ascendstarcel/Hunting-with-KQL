@@ -1,0 +1,9 @@
+//Rubber Ducky Payload: Suspicious Keyboard Emulation
+//Detect powershell.exe launched by winlogon.exe or explorer.exe with short dwell time after logon.
+DeviceProcessEvents
+| where FileName == "powershell.exe"
+| where InitiatingProcessFileName in ("winlogon.exe", "explorer.exe")
+| where Timestamp between (LogonEvents[0].Timestamp .. LogonEvents[0].Timestamp + 2m)
+| where ProcessCommandLine contains_any ("-EncodedCommand", "IEX", "DownloadString")
+| project Timestamp, DeviceName, ProcessCommandLine, InitiatingProcessFileName
+| order by Timestamp desc
