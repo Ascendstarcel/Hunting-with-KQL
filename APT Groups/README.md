@@ -54,7 +54,7 @@ Each subfolder contains:
 - ATT&CK-Based Threat Detection and Hunting with KQL  
   https://learn.microsoft.com/en-us/azure/sentinel/hunting
 
-- Detection Engineering Wiki  
-  https://detectionengineering.wiki/
+- SOCPRIME YAML files
+  https://github.com/socprime/SigmaRulesIntegration
 
 
