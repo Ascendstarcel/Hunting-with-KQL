@@ -1,4 +1,4 @@
-#WiFi Pineapple Detection Query
+## WiFi Pineapple Detection Query
 
 ## Purpose
 This query is designed to detect suspicious behavior associated with rogue wireless access points, specifically devices like the **Hak5 WiFi Pineapple**, which are used for wireless man-in-the-middle (MitM) attacks, DNS spoofing, and rogue captive portals.
