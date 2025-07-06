@@ -1,0 +1,11 @@
+// Detect USB Device Plug and Immediate PowerShell
+// Detect PowerShell run within 30s of USB device mount
+DeviceEvents
+| where ActionType == "UsbDriveMounted"
+| join kind=inner (
+    DeviceProcessEvents
+    | where FileName == "powershell.exe"
+    | project PowershellTime = Timestamp, DeviceName, ProcessCommandLine
+) on DeviceName
+| where PowershellTime between (Timestamp .. Timestamp + 30s)
+| project Timestamp, DeviceName, ProcessCommandLine
