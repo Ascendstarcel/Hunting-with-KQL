@@ -1,0 +1,13 @@
+// HID Emulation + Net User Add + PowerShell
+// Detect suspicious account creation and PowerShell shortly after logon (mimicking Rubber Ducky payloads)
+DeviceLogonEvents
+| where LogonType == 2 or LogonType == 10
+| summarize by DeviceName, LogonTime = Timestamp
+| join kind=inner (
+    DeviceProcessEvents
+    | where FileName in ("powershell.exe", "net.exe")
+    | where ProcessCommandLine contains_any ("add", "-enc", "DownloadString", "IEX")
+    | project DeviceName, ProcessTime = Timestamp, ProcessCommandLine
+) on DeviceName
+| where ProcessTime between (LogonTime .. LogonTime + 2m)
+| project DeviceName, LogonTime, ProcessTime, ProcessCommandLine
