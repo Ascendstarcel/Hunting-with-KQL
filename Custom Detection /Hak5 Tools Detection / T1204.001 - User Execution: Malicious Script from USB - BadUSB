@@ -1,0 +1,8 @@
+//  Detect script execution (cmd, PowerShell, JS, VBS) from removable drives
+
+DeviceProcessEvents
+| where InitiatingProcessFolderPath startswith @"E:\" or InitiatingProcessFolderPath startswith @"F:\"
+| where FileName endswith ".ps1" or FileName endswith ".vbs" or FileName endswith ".cmd" or FileName endswith ".bat"
+| project Timestamp, DeviceName, FileName, FolderPath, ProcessCommandLine
+| order by Timestamp desc
+
