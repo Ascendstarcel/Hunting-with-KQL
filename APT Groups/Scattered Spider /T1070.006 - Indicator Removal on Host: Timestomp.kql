@@ -1,0 +1,7 @@
+// T1070.006 - Indicator Removal on Host: Timestomp
+// Detect file timestomping via timestomp tools or suspicious PowerShell commands
+DeviceProcessEvents
+| where FileName in ("powershell.exe", "cmd.exe")
+| where ProcessCommandLine contains_any ("timestomp", "SetFileTime", "Set-ItemProperty")
+| project Timestamp, DeviceName, ProcessCommandLine
+| order by Timestamp desc
