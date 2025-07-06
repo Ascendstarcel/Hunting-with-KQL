@@ -1,1 +1,9 @@
+//T1055.001 – Process Injection: Dynamic-link Library Injection
+//Injecting malicious DLLs into trusted processes to evade detection.
 
+DeviceImageLoadEvents
+| where InitiatingProcessFileName in ("rundll32.exe", "svchost.exe", "explorer.exe")
+| where FileName endswith ".dll"
+| where InitiatingProcessParentFileName !in ("rundll32.exe", "svchost.exe", "explorer.exe") // exclude normal loads
+| project Timestamp, DeviceName, InitiatingProcessFileName, FileName, InitiatingProcessParentFileName
+| order by Timestamp desc
