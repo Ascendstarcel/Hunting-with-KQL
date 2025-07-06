@@ -1,0 +1,8 @@
+//T1059.001 – PowerShell
+//  Use of PowerShell for execution and lateral movement, often obfuscated or run with encoded commands.
+DeviceProcessEvents
+| where FileName == "powershell.exe"
+| where ProcessCommandLine contains_any ("-EncodedCommand", "-enc", "-e", "-nop", "-w hidden")
+| where ProcessCommandLine !contains "ConstrainedLanguage"
+| project Timestamp, DeviceName, InitiatingProcessFileName, FileName, ProcessCommandLine
+| order by Timestamp desc
