@@ -1,0 +1,6 @@
+// T1547.001 - Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder
+// Detect creation or modification of registry run keys (persistence)
+DeviceRegistryEvents
+| where RegistryKeyName has_any ("Run", "RunOnce")
+| project Timestamp, DeviceName, RegistryKeyName, RegistryValueName, InitiatingProcessFileName
+| order by Timestamp desc
