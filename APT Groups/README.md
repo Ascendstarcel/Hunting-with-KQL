@@ -55,6 +55,6 @@ Each subfolder contains:
   https://learn.microsoft.com/en-us/azure/sentinel/hunting
 
 - SOCPRIME YAML files
-  https://github.com/socprime/SigmaRulesIntegration
+    https://github.com/socprime/SigmaRulesIntegration
 
 
