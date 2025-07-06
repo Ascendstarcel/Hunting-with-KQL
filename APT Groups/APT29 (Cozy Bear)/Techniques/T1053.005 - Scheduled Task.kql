@@ -1,0 +1,6 @@
+// T1053.005 - Scheduled Task
+// Detect creation of scheduled tasks via schtasks or PowerShell
+DeviceProcessEvents
+| where ProcessCommandLine contains_any ("schtasks.exe /create", "New-ScheduledTaskTrigger")
+| project Timestamp, DeviceName, ProcessCommandLine, InitiatingProcessFileName
+| order by Timestamp desc
