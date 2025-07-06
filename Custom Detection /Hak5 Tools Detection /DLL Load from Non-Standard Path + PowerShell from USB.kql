@@ -1,0 +1,13 @@
+// DLL Load from Non-Standard Path + PowerShell from USB
+// Detect DLL sideloading + script run from USB drive
+DeviceImageLoadEvents
+| where FolderPath !startswith "C:\\Windows" and FileName endswith ".dll"
+| summarize by DeviceName, DLLPath = FolderPath, DLLTime = Timestamp
+| join kind=inner (
+    DeviceProcessEvents
+    | where FileName == "powershell.exe"
+    | where InitiatingProcessFolderPath startswith @"E:\" or InitiatingProcessFolderPath startswith @"F:\"
+    | project DeviceName, PSPath = FolderPath, PSTime = Timestamp, ProcessCommandLine
+) on DeviceName
+| where abs(datetime_diff("minute", DLLTime, PSTime)) <= 2
+| project DeviceName, DLLPath, DLLTime, PSPath, PSTime, ProcessCommandLine
