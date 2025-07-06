@@ -1,42 +1,60 @@
-# APT29 - Detection Queries by MITRE ATT&CK Technique
+# Adversary-Based Detection Queries
 
 ## Overview
 
-APT29, also known as Cozy Bear or The Dukes, is a state-sponsored threat group attributed to the Russian Foreign Intelligence Service (SVR). The group is known for conducting long-term espionage campaigns targeting government, diplomatic, healthcare, and research organizations, particularly across North America and Europe.
+This directory contains detection and hunting queries mapped to adversary behaviors as documented in the MITRE ATT&CK framework. Each folder represents a threat actor or campaign, with detection logic aligned to the techniques observed in publicly attributed activity.
 
-APT29 is characterized by its stealth, operational security, and use of legitimate services and credentials to maintain access.
+The goal is to help defenders implement structured and threat-informed detection coverage based on real-world adversary behavior.
 
-This repository contains detection and hunting queries mapped to MITRE ATT&CK techniques observed in APT29 campaigns. The goal is to provide defenders with actionable logic to detect, investigate, and respond to behaviors consistent with this adversary.
+## Purpose
 
-## Repository Structure
+- Provide actionable detection logic for common adversary techniques
+- Support security operations teams in threat hunting and incident response
+- Map detections to MITRE ATT&CK for consistent reporting and prioritization
+- Enable structured adversary emulation and control validation
 
-Each file corresponds to a specific MITRE ATT&CK technique and includes the following:
+## Contents
 
-- MITRE Technique ID and name
-- Brief description of how APT29 uses the technique
-- Detection logic (typically in Kusto Query Language for Microsoft Defender/Sentinel)
-- References to public threat intelligence
+Each subfolder contains:
 
-## Usage
+- MITRE ATT&CK technique-aligned queries
+- Detection logic in Kusto Query Language (KQL) and/or other formats
+- Context or rationale for how and why each technique is used
+- References to threat intelligence where applicable
 
-The queries in this repository are designed for:
+## References
 
-- Threat hunting
-- Detection engineering
-- Control validation
-- ATT&CK mapping and reporting
+- MITRE ATT&CK Framework  
+  https://attack.mitre.org/
 
-Security teams can adapt the queries to their environment and data sources. Where possible, queries are written with generic patterns to ensure broader applicability.
+- MITRE ATT&CK Techniques by Tactic  
+  https://attack.mitre.org/matrices/enterprise/
 
-## Techniques Covered
+- MITRE ATT&CK Navigator  
+  https://mitre-attack.github.io/attack-navigator/
 
-| Technique ID | Technique Name                      | File Name                              | Status        |
-|--------------|-------------------------------------|----------------------------------------|---------------|
-| T1217        | Browser Information Discovery       | T1217_BrowserInformationDiscovery.kql  | Complete      |
-| T1059.001    | Command and Scripting: PowerShell   | T1059.001_PowerShellUsage.kql          | Complete      |
-| T1082        | System Information Discovery        | T1082_SystemInfoDiscovery.kql          | Complete      |
-| T1112        | Modify Registry                     | T1112_ModifyRegistry.kql               | In progress   |
-| T1003.001    | LSASS Memory Credential Dumping     | T1003.001_LSASSDumping.kql             | Planned       |
-| T1560.001    | Archive via Utility                 | T1560.001_ArchiveViaUtility.kql        | Planned       |
+- Sigma Rule Format for Detection Engineering  
+  https://sigmahq.io/
+
+- Microsoft Threat Intelligence: Detection and Hunting Guidance  
+  https://www.microsoft.com/security/blog/
+
+- Elastic Security: Threat Detection with EQL and Sigma  
+  https://www.elastic.co/security-labs
+
+- Red Canary Threat Detection Reports  
+  https://redcanary.com/threat-detection-report/
+
+- CISA Known Exploited Vulnerabilities Catalog  
+  https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+
+- Mandiant Threat Intelligence Resources  
+  https://www.mandiant.com/resources
+
+- ATT&CK-Based Threat Detection and Hunting with KQL  
+  https://learn.microsoft.com/en-us/azure/sentinel/hunting
+
+- Detection Engineering Wiki  
+  https://detectionengineering.wiki/
 
 
