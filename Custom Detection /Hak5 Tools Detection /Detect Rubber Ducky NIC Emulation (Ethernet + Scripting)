@@ -1,0 +1,11 @@
+// Detect Rubber Ducky NIC Emulation (Ethernet + Scripting)
+// Detect new network interface + powershell run shortly after
+
+DeviceNetworkEvents
+| where RemoteIP == "169.254.0.1" or RemoteUrl contains "payload.txt" or RemotePort == 80
+| join kind=inner (
+    DeviceProcessEvents
+    | where FileName == "powershell.exe"
+    | where ProcessCommandLine contains_any ("IEX", "New-Object", "DownloadString")
+) on DeviceName
+| project Timestamp, DeviceName, ProcessCommandLine, RemoteUrl
