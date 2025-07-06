@@ -1,0 +1,45 @@
+// Combined Metasploit Detection Query
+
+// 1. PowerShell Meterpreter payload execution
+let psMeterpreter = DeviceProcessEvents
+| where FileName == "powershell.exe"
+| where ProcessCommandLine has_any ("-enc", "IEX")
+| where ProcessCommandLine has_any ("meterpreter", "reverse_tcp", "invoke-mimikatz")
+| extend DetectionType = "PowerShell Meterpreter Payload Execution"
+| project Timestamp, DeviceName, InitiatingProcessFileName, ProcessCommandLine, DetectionType;
+
+// 2. Known Metasploit process or payload execution
+let msfProcesses = DeviceProcessEvents
+| where FileName in ("meterpreter.exe", "msf.exe", "exploit.exe", "msfvenom.exe")
+| extend DetectionType = "Known Metasploit Executable"
+| project Timestamp, DeviceName, InitiatingProcessFileName, ProcessCommandLine, DetectionType;
+
+// 3. Outbound network connections on common Metasploit ports
+let msfNetwork = DeviceNetworkEvents
+| where RemotePort in (4444, 5555, 6666, 8080)
+| where InitiatingProcessFileName in ("powershell.exe", "cmd.exe", "meterpreter.exe")
+| extend DetectionType = "Outbound Network Connection on Metasploit Ports"
+| project Timestamp, DeviceName, RemoteIP, RemotePort, InitiatingProcessFileName, DetectionType;
+
+// 4. Exploit attempts via known scanning ports and suspicious commands
+let exploitAttempts = DeviceNetworkEvents
+| where RemotePort in (445, 3389, 80, 443)
+| where ProcessCommandLine has_any ("exploit", "scanner", "msf", "meterpreter")
+| extend DetectionType = "Exploit Attempt Detected"
+| project Timestamp, DeviceName, RemoteIP, RemotePort, ProcessCommandLine, DetectionType;
+
+// 5. Creation of suspicious executables or scripts in temp or user directories
+let suspiciousFiles = DeviceFileEvents
+| where FileName endswith_any (".exe", ".ps1", ".dll")
+| where FolderPath has_any ("temp", "appdata", "programdata")
+| where FileName has_any ("meterpreter", "msf", "exploit", "reverse")
+| extend DetectionType = "Suspicious File Creation"
+| project Timestamp, DeviceName, FolderPath, FileName, DetectionType;
+
+// Union all detections
+psMeterpreter
+| union msfProcesses
+| union msfNetwork
+| union exploitAttempts
+| union suspiciousFiles
+| order by Timestamp desc
