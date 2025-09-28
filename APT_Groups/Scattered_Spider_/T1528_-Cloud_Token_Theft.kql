@@ -1,7 +1,6 @@
-// T1001.003 - Data Obfuscation: Steganography
-// Detect suspicious file writes with common image/video extensions and abnormal file sizes
-DeviceFileEvents
-| where FileName matches regex @"(?i).*\.(jpg|png|gif|mp4|avi)$"
-| where FileSize > 10 * 1024 * 1024 // larger than 10MB unusual for images/videos
-| project Timestamp, DeviceName, FileName, FileSize, FolderPath, InitiatingProcessFileName
-| order by Timestamp desc
+// T1528 - Cloud Token Theft
+// Detects OAuth token access for suspicious sessions
+AuditLogs
+| where OperationName contains "OAuth" and AdditionalDetails contains "token"
+| where Result == "Succeeded"
+| project TimeGenerated, UserId, SourceSystem, IPAddress
