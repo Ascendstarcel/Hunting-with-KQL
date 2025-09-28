@@ -1,5 +1,8 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
-DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+// T1070.004 - File Deletion
+// Detect bulk deletion of forensic/logging files within short timeframes
+DeviceFileEvents
+| where ActionType == "FileDeleted"
+| summarize Deletes=count() by InitiatingProcessAccountName, bin(Timestamp, 5m)
+| where Deletes > 10
+| project InitiatingProcessAccountName, Timestamp, Deletes
+| order by Deletes desc
