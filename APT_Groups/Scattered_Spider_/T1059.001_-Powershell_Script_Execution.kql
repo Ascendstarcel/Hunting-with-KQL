@@ -1,8 +1,6 @@
-// T1489 - Service Stop
-// Detects attempts to stop security or backup services which could possibly be for ransomware prep
+// T1059.001 - PowerShell Script Execution
+// Finds rare or obfuscated PowerShell commands
 DeviceProcessEvents
-| where FileName == "sc.exe"
-| where ProcessCommandLine has_any ("stop", "delete", "config")
-| where ProcessCommandLine contains_any ("windowsdefender", "backup", "vss")
+| where FileName == "powershell.exe"
+| where ProcessCommandLine contains "Base64" or ProcessCommandLine contains "Invoke"
 | project Timestamp, DeviceName, ProcessCommandLine
-| order by Timestamp desc
