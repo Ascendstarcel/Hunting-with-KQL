@@ -1,5 +1,8 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
-DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+// T1547.001 - Registry Run Key Persistence
+// Detects new or modified run keys for persistence
+DeviceRegistryEvents
+| where RegistryKey has_any ("Run", "RunOnce")
+| where RegistryValueName !in ("SecurityHealth", "OneDrive", "Antimalware")
+| where RegistryData !contains "Windows\\System32"
+| project Timestamp, DeviceName, RegistryKey, RegistryValueName, RegistryData, InitiatingProcessAccountName
+| order by Timestamp desc
