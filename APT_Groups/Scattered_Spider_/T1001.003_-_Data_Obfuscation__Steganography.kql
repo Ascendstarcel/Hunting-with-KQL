@@ -1,7 +1,6 @@
-// T1001.003 - Data Obfuscation: Steganography
-// Detect suspicious file writes with common image/video extensions and abnormal file sizes
-DeviceFileEvents
-| where FileName matches regex @"(?i).*\.(jpg|png|gif|mp4|avi)$"
-| where FileSize > 10 * 1024 * 1024 // larger than 10MB unusual for images/videos
-| project Timestamp, DeviceName, FileName, FileSize, FolderPath, InitiatingProcessFileName
+// T1027 - Obfuscated Files or Information
+// Detect creation or download of base64 or packed payload binaries
+DeviceNetworkEvents
+| where RemoteUrl matches regex @"(base64|packed|obfuscated)"
+| project Timestamp, DeviceName, RemoteUrl, InitiatingProcessAccountName
 | order by Timestamp desc
