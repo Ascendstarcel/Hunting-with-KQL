@@ -1,4 +1,4 @@
-/ T1562.001 - Conditional Access Abuse
+// T1562.001 - Conditional Access Abuse
 // Detects changes to trusted locations in Conditional Access policies
 AuditLogs
 | where ActivityDisplayName == "Modify conditional Access policy"
