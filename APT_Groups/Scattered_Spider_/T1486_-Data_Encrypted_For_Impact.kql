@@ -1,5 +1,32 @@
-// T1559 - Browser Automation/Playwright
-// Detects use of browser automation tools
-DeviceProcessEvents
-| where FileName in ("playwright.exe", "puppeteer.exe")
-| project Timestamp, DeviceName, ProcessCommandLine
+// T1486 - Data Encrypted For Impact
+// Advanced ransomware detection: looks for bulk file extension changes to suspicious types, new extensions, high entropy (random-looking) names, ransom notes, and associated destructive backup activity.
+
+let suspect_extensions = dynamic([".enc", ".locked", ".crypted", ".encrypted", ".crypto", ".lockedfile"]);
+let entropy_threshold = 4.0; // For file names that are highly random, likely crypto-generated.
+// 1. Detect bulk file operations with new/suspicious extensions
+DeviceFileEvents
+| where ActionType in ("FileCreated", "FileModified", "FileRenamed")
+| extend FileExt = tostring(split(FileName, ".")[-1])
+| extend FullExt = strcat(".", FileExt)
+| where FullExt in (suspect_extensions) or strlen(FileExt) > 5 // Unusually long extension (likely ransomware)
+// 2. Check for high-entropy file names suggesting random hex/crypto
+| extend NameEntropy = binary_entropy(tostring(split(FileName, ".")[0]))
+| extend isHighEntropy = iff(NameEntropy > entropy_threshold, 1, 0)
+// 3. Find ransom note dropping
+| extend isRansomNote = iff(FileName matches regex @"(?i)(readme|help|decrypt|restore|recover|unlock|ransom).*\.txt", 1, 0)
+| summarize
+    FirstSeen=min(Timestamp),
+    LastSeen=max(Timestamp),
+    ExtChangeEvents=count(),
+    UniqueFolderCount=dcount(FolderPath),
+    HighEntropyCount=sum(isHighEntropy),
+    RansomNoteCount=sum(isRansomNote),
+    Devices=make_set(DeviceName, 5),
+    Users=make_set(InitiatingProcessAccountName, 5)
+    by FullExt
+| where ExtChangeEvents > 10 // Focuses on bulk extension changes
+// 4. Join with backup/shadow copy deletion activity
+| join kind=leftouter (
+    DeviceProcessEvents
+    | where ProcessCommandLine has_any("vssadmin", "shadowcopy", "wbadmin", "bcdedit", "delete", "remove") 
+    | summarize BackupDestruction
