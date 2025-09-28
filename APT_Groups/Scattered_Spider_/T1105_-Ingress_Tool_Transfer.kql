@@ -1,8 +1,5 @@
-// T1489 - Service Stop
-// Detects attempts to stop security or backup services which could possibly be for ransomware prep
-DeviceProcessEvents
-| where FileName == "sc.exe"
-| where ProcessCommandLine has_any ("stop", "delete", "config")
-| where ProcessCommandLine contains_any ("windowsdefender", "backup", "vss")
-| project Timestamp, DeviceName, ProcessCommandLine
-| order by Timestamp desc
+// T1105 - Ingress Tool Transfer
+// Finds large file transfers from internet sources
+DeviceNetworkEvents
+| where RemoteUrl endswith ".exe" or RemoteUrl endswith ".zip"
+| project Timestamp, DeviceName, RemoteUrl
