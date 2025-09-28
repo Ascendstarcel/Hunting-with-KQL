@@ -1,6 +1,25 @@
-// T1557 - Adversary-in-the-Middle
-// Detects logins with mismatched device or browser signatures in one session
-SigninLogs
-| summarize by UserPrincipalName, DeviceDetail, IPAddress, ResultType
-| where dcount(DeviceDetail) > 1 and dcount(IPAddress) > 1
-| project UserPrincipalName, DeviceDetail, IPAddress
+// T1041 - Exfiltration Over Web
+// Detects large web downloads/exports, uncommon destination exfil, new/unknown URLs, off-hours activity, and summarizes user context
+DeviceNetworkEvents
+| where (RemoteUrl contains "download" or RemoteUrl contains "export" or RemoteUrl matches regex @"(?i)\b(backup|dump|report|data|file|export|sync)\b")
+| where InitiatingProcessFileName in ("chrome.exe", "msedge.exe", "firefox.exe", "iexplore.exe") // browser-based exfil
+| summarize 
+    total_bytes_sent=sum(BytesSent),
+    min_time=min(Timestamp),
+    max_time=max(Timestamp),
+    connection_count=count(),
+    unique_remote_ips=dcount(RemoteIP),
+    examples=make_set(RemoteUrl, 5)
+    by DeviceName, AccountName, RemoteUrl, RemoteIP
+| where total_bytes_sent > 50000000 // 50 MB, adjust as organizationally relevant
+| extend
+    unusual_hours = iff(hour(min_time) < 7 or hour(min_time) > 19, 1, 0),
+    weekend = iff(dayofweek(min_time) > 4, 1, 0)
+| join kind=leftouter (
+    SecurityAlert
+    | project AlertTime=TimeGenerated, DeviceName, AccountName, AlertName
+) on DeviceName, AccountName
+| extend 
+    alert_triggered = iff(isnull(AlertName), 0, 1)
+| project min_time, max_time, DeviceName, AccountName, RemoteUrl, RemoteIP, total_bytes_sent, unique_remote_ips, connection_count, unusual_hours, weekend, AlertName, alert_triggered, examples
+| order by total_bytes_sent desc
