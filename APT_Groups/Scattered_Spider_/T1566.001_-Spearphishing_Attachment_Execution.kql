@@ -1,5 +1,8 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
-DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+// T1566.001 - Spearphishing Attachment Execution
+// Detects suspicious execution of Office macro enabled files from email client download folders
+DeviceProcessEvents
+| where FileName endswith ".exe" or FileName endswith ".js" or FileName endswith ".bat"
+| where FolderPath contains_any ("Downloads", "AppData\\Local\\Temp", "Outlook")
+| where InitiatingProcessFileName in ("winword.exe", "excel.exe", "powerpnt.exe", "outlook.exe")
+| project Timestamp, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine
+| order by Timestamp desc
