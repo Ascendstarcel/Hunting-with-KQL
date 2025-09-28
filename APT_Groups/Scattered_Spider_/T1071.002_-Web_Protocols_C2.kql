@@ -1,5 +1,8 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
+// T1071.002 - Web Protocols C2
+// Detect anomalous HTTP/S beaconing with rare user agents or headers
 DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+| where RemoteUrl startswith "https://" or RemoteUrl startswith "http://"
+| where UserAgent !in ("Mozilla", "Chrome", "Edge")
+| summarize count() by UserAgent, RemoteUrl
+| where count_ > 50
+| project UserAgent, RemoteUrl
