@@ -1,5 +1,6 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
+// T1046 - Network Service Scanning
+// Detect TCP network scans with multiple ports hit from single host
 DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+| summarize PortCount=dcount(RemotePort) by InitiatingProcessAccountName, DeviceName, bin(Timestamp, 10m)
+| where PortCount > 20
+| project InitiatingProcessAccountName, DeviceName, PortCount, Timestam
