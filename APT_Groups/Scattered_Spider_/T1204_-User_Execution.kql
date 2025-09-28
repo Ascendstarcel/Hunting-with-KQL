@@ -1,5 +1,7 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
-DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+// T1204 - User Execution
+// Detects suspicious process spawning from common browsers involving command execution
+DeviceProcessEvents
+| where InitiatingProcessFileName in ("chrome.exe", "firefox.exe", "msedge.exe")
+| where FileName in ("cmd.exe", "powershell.exe", "wscript.exe")
+| project Timestamp, DeviceName, InitiatingProcessFileName, FileName, ProcessCommandLine
+| order by Timestamp desc
