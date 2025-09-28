@@ -1,5 +1,6 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
+// T1027 - Obfuscated Files or Information
+// Detect creation or download of base64 or packed payload binaries
 DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+| where RemoteUrl matches regex @"(base64|packed|obfuscated)"
+| project Timestamp, DeviceName, RemoteUrl, InitiatingProcessAccountName
+| order by Timestamp desc
