@@ -1,7 +1,5 @@
-// T1070.001 - Indicator Removal on Host: Clear Windows Event Logs
-// Detect clearing of security event logs using wevtutil or PowerShell
-DeviceProcessEvents
-| where FileName in ("wevtutil.exe", "powershell.exe")
-| where ProcessCommandLine contains_any ("cl", "clear-log", "Clear-EventLog", "Remove-EventLog")
-| project Timestamp, DeviceName, ProcessCommandLine
-| order by Timestamp desc
+// T1078 - SIM Swapping Attempts
+// Detects authentication phone number changes followed by suspicious login attempts
+AuditLogs
+| where OperationName == "Change authentication phone number"
+| project TimeGenerated, TargetUser, InitiatedBy
