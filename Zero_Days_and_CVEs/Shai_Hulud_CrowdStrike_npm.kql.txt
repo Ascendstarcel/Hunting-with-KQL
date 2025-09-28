@@ -1,0 +1,19 @@
+// Detection hunt for Shai Hulud CrowdStrike npm supply chain attack (CVE-2025-9988)
+DeviceProcessEvents
+| where TimeGenerated > ago(30d)
+| where InitiatingProcessFileName in ("npm.exe", "npm.cmd", "node.exe")
+| where ProcessCommandLine has_any ("install", "add", "update", "run")
+| where ProcessCommandLine contains_cs "crowdstrike" or ProcessCommandLine contains_cs "shaihulud" or ProcessCommandLine contains_cs "@crowdstrike"
+// Add additional known malicious package names or namespaces from threat intel as needed
+| project TimeGenerated, DeviceName, UserName, InitiatingProcessFileName, ProcessCommandLine
+| order by TimeGenerated desc
+
+// Optionally correlate with network events to suspicious domains or IPs known from IoCs
+union (
+    NetworkCommunicationEvents
+    | where TimeGenerated > ago(30d)
+    | where RemoteUrl contains_cs "npmjs.org" or RemoteUrl contains_cs "registry.npmjs.org"
+    | where InitiatingProcessFileName in ("npm.exe", "node.exe")
+    | project TimeGenerated, DeviceName, RemoteUrl, InitiatingProcessFileName
+)
+| order by TimeGenerated desc
