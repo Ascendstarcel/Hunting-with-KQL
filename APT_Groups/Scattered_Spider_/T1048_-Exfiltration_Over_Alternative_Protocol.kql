@@ -1,5 +1,5 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
+// T1048 - Exfiltration Over Alternative Protocol
+// Detect unusual DNS tunneling or ICMP exfiltration traffic
 DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+| where Protocol in ("DNS", "ICMP") and BytesSent > 10000000
+| project Timestamp, DeviceName, RemoteUrl, BytesSent
