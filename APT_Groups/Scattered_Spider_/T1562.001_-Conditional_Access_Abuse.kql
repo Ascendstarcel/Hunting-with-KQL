@@ -1,8 +1,7 @@
-// T1489 - Service Stop
-// Detects attempts to stop security or backup services which could possibly be for ransomware prep
-DeviceProcessEvents
-| where FileName == "sc.exe"
-| where ProcessCommandLine has_any ("stop", "delete", "config")
-| where ProcessCommandLine contains_any ("windowsdefender", "backup", "vss")
-| project Timestamp, DeviceName, ProcessCommandLine
-| order by Timestamp desc
+/ T1562.001 - Conditional Access Abuse
+// Detects changes to trusted locations in Conditional Access policies
+AuditLogs
+| where ActivityDisplayName == "Modify conditional Access policy"
+| where TargetResources contains "Trusted locations"
+| project TimeGenerated, TargetResources, InitiatedBy
+| order by TimeGenerated desc
