@@ -3,3 +3,13 @@
 DeviceNetworkEvents
 | where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
 | project Timestamp, DeviceName, RemoteUrl
+
+
+or 
+
+let MajorDDNS=dynamic(["changeip.com","cloudns.net","dnsexit.com","duckdns.org",
+"duiadns.net","dyn.com","dynu.com","now-dns.com","ydns.io","noip.com"]);
+EmailUrlInfo
+|where TimeGenerated > ago(90d)
+|where Url has_any(MajorDDNS)
+summarize Count=count() by bin(TimeGenerated,1d)
