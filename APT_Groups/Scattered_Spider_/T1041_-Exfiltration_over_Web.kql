@@ -1,0 +1,6 @@
+// T1557 - Adversary-in-the-Middle
+// Detects logins with mismatched device or browser signatures in one session
+SigninLogs
+| summarize by UserPrincipalName, DeviceDetail, IPAddress, ResultType
+| where dcount(DeviceDetail) > 1 and dcount(IPAddress) > 1
+| project UserPrincipalName, DeviceDetail, IPAddress

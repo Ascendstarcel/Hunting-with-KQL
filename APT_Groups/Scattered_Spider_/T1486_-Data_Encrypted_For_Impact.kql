@@ -1,0 +1,5 @@
+// T1559 - Browser Automation/Playwright
+// Detects use of browser automation tools
+DeviceProcessEvents
+| where FileName in ("playwright.exe", "puppeteer.exe")
+| project Timestamp, DeviceName, ProcessCommandLine
