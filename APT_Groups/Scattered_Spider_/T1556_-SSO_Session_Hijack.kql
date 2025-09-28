@@ -1,6 +1,6 @@
-// T1557 - Adversary-in-the-Middle
-// Detects logins with mismatched device or browser signatures in one session
+// T1556 - SSO Session Hijack
+// Detects SSO session switches between disparate devices
 SigninLogs
-| summarize by UserPrincipalName, DeviceDetail, IPAddress, ResultType
-| where dcount(DeviceDetail) > 1 and dcount(IPAddress) > 1
-| project UserPrincipalName, DeviceDetail, IPAddress
+| summarize by SessionId, UserPrincipalName, DeviceDetail
+| where dcount(DeviceDetail) > 1
+| project SessionId, UserPrincipalName, DeviceDetai
