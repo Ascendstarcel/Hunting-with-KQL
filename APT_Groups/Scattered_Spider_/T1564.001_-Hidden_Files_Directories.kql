@@ -1,5 +1,6 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
-DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+// T1564.001 - Hidden Files and Directories
+// Detects creation of hidden files or alternate data streams
+DeviceFileEvents
+| where FileAttributes has_any ("Hidden", "System") or FileName contains ":$DATA"
+| project Timestamp, DeviceName, FileName, FolderPath, InitiatingProcessAccountName
+| order by Timestamp desc
