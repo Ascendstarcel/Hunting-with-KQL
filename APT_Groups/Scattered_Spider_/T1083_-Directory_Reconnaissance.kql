@@ -1,14 +1,5 @@
-// T1078 - Valid Accounts
-// Detect suspicious or rare logins by users, especially logins outside normal hours or from unusual locations or devices
-SecurityEvent
-| where EventID == 4624  // Windows logon success event
-| extend AccountName = tostring(Account)
-| where AccountName !in ("SYSTEM", "LOCAL SERVICE", "NETWORK SERVICE")
-| summarize LogonCount = count(), StartTime = min(TimeGenerated), EndTime = max(TimeGenerated) by AccountName, Computer, LogonType
-| join kind=inner (
-    SecurityEvent
-    | where EventID == 4625  // Failed login attempts
-    | summarize FailedCount = count() by AccountName
-) on AccountName
-| extend Suspicious = case(FailedCount > 5 and LogonCount > 10, "Possible brute force or misuse", "Normal")
-| where Suspicious == "Possible brute force or misuse"
+// T1083 - Directory Reconnaissance
+// Detects browsing of sensitive files or folders
+DeviceFileEvents
+| where FileName in ("secrets", "confidential", "sensitive")
+| project Timestamp, DeviceName, FileName, InitiatingProcessAccountName
