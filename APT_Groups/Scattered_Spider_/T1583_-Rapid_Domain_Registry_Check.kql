@@ -1,5 +1,5 @@
-// T1543 - Azure Arc Agent Persistence
-// Detects installation of Azure Arc agent for persistence
-DeviceProcessEvents
-| where FileName contains "azcmagent"
-| project Timestamp, DeviceName, ProcessCommandLine
+// T1583 - Rapid Domain Registry Check
+// Detects access to recently registered domains
+DeviceNetworkEvents
+| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
+| project Timestamp, DeviceName, RemoteUrl
