@@ -1,5 +1,6 @@
-// T1583 - Rapid Domain Registry Check
-// Detects access to recently registered domains
-DeviceNetworkEvents
-| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
-| project Timestamp, DeviceName, RemoteUrl
+// T1098 - Account Manipulation
+// Detect silent MFA or credential changes to accounts 
+AuditLogs
+| where OperationName in ("Update user", "Change multi-factor authentication settings")
+| project TimeGenerated, InitiatedBy, TargetResources, ActivityDisplayName
+| order by TimeGenerated desc
