@@ -1,7 +1,7 @@
-// T1566.001 - Phishing: Spearphishing Attachment
-// Detect email attachments execution via Outlook or Explorer
-DeviceProcessEvents
-| where FileName in ("outlook.exe", "explorer.exe")
-| where ProcessCommandLine contains_any (".doc", ".xls", ".exe", ".js")
-| project Timestamp, DeviceName, FileName, ProcessCommandLine
-| order by Timestamp desc
+// T1078.004 - OAuth Token Replay
+// Finds excessive OAuth token replay attempts
+SigninLogs
+| where TokenIssuer contains "OAuth"
+| summarize cnt=count() by UserPrincipalName, IPAddress
+| where cnt > 2
+| project UserPrincipalName, IPAddress, cnt
