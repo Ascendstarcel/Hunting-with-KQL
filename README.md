@@ -28,5 +28,5 @@ Contributions are welcome! Please create a pull request with your additions or i
 - Zero-day vulnerability Advisories
 
 ## Contact
+For questions or collaboration inquiries, please contact me on [LinkedIn](https://www.linkedin.com/in/sunstarpandey/)
 
-For questions or collaboration inquiries, please contact me @ [https://www.linkedin.com/in/sunstarpandey/]
