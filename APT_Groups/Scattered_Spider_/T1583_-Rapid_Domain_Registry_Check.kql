@@ -12,4 +12,4 @@ let MajorDDNS=dynamic(["changeip.com","cloudns.net","dnsexit.com","duckdns.org",
 EmailUrlInfo
 |where TimeGenerated > ago(90d)
 |where Url has_any(MajorDDNS)
-summarize Count=count() by bin(TimeGenerated,1d)
+|summarize Count=count() by bin(TimeGenerated,1d)
