@@ -1,0 +1,5 @@
+// T1583 - Rapid Domain Registry Check
+// Detects access to recently registered domains
+DeviceNetworkEvents
+| where RemoteUrl startswith "http" and matches regex @"[0-9]{8}"
+| project Timestamp, DeviceName, RemoteUrl
