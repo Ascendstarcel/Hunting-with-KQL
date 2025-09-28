@@ -1,5 +1,6 @@
-// T1082 - System Information Discovery
-// Detects system profiling tool use on endpoints
+// T1518 - Software Enumeration
+// Detects inventory tooling usage on endpoints
 DeviceProcessEvents
-| where FileName in ("systeminfo.exe", "hostname.exe")
+| where FileName contains "wmic"
+| where ProcessCommandLine contains "product get"
 | project Timestamp, DeviceName, ProcessCommandLine
