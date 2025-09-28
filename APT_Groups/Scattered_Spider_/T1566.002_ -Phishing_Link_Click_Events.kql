@@ -1,7 +1,6 @@
-// T1566.001 - Phishing: Spearphishing Attachment
-// Detect email attachments execution via Outlook or Explorer
-DeviceProcessEvents
-| where FileName in ("outlook.exe", "explorer.exe")
-| where ProcessCommandLine contains_any (".doc", ".xls", ".exe", ".js")
-| project Timestamp, DeviceName, FileName, ProcessCommandLine
-| order by Timestamp desc
+// T1566.002 - Phishing Link Click Events
+// Detects clicks on phishing URLs in emails associated with Okta login attempts
+EmailUrlInfo
+| where Url contains "okta" or Url contains "login"
+| project UrlClickTime, Recipient, Url
+| order by UrlCl
