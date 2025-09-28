@@ -1,7 +1,6 @@
-// T1001.003 - Data Obfuscation: Steganography
-// Detect suspicious file writes with common image/video extensions and abnormal file sizes
-DeviceFileEvents
-| where FileName matches regex @"(?i).*\.(jpg|png|gif|mp4|avi)$"
-| where FileSize > 10 * 1024 * 1024 // larger than 10MB unusual for images/videos
-| project Timestamp, DeviceName, FileName, FileSize, FolderPath, InitiatingProcessFileName
-| order by Timestamp desc
+// T1111 - MFA Token Replay Abuse
+// Finds repeated use of MFA tokens for the same user from multiple IPs
+SigninLogs
+| summarize cnt=count(), distinct_ip=dcount(IPAddress) by UserPrincipalName
+| where cnt > 1 and distinct_ip > 1
+| project UserPrincipalName, cnt, distinct_ip
