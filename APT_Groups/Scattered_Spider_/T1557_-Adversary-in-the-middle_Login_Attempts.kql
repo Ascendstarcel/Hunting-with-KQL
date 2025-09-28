@@ -1,7 +1,6 @@
-// T1070.006 - Indicator Removal on Host: Timestomp
-// Detect file timestomping via timestomp tools or suspicious PowerShell commands
-DeviceProcessEvents
-| where FileName in ("powershell.exe", "cmd.exe")
-| where ProcessCommandLine contains_any ("timestomp", "SetFileTime", "Set-ItemProperty")
-| project Timestamp, DeviceName, ProcessCommandLine
-| order by Timestamp desc
+// T1557 - Adversary-in-the-Middle
+// Detects logins with mismatched device or browser signatures in one session
+SigninLogs
+| summarize by UserPrincipalName, DeviceDetail, IPAddress, ResultType
+| where dcount(DeviceDetail) > 1 and dcount(IPAddress) > 1
+| project UserPrincipalName, DeviceDetail, IPAddress
