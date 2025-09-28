@@ -1,53 +1,5 @@
-// T1110 - Brute Force Detection: Multiple failed logons by user
-
-// Combined brute force and wordlist attack detection
-
-// Failed logons by user
-let failedByUser = DeviceLogonEvents
-| where LogonResult == "Failure"
-| summarize FailedAttempts = count(), StartTime = min(Timestamp), EndTime = max(Timestamp) by AccountName, DeviceName, bin(Timestamp, 5m)
-| where FailedAttempts >= 5
-| extend DetectionType = "Failed Logons by User";
-
-// Failed logons by IP
-let failedByIP = DeviceLogonEvents
-| where LogonResult == "Failure"
-| summarize FailedAttempts = count(), StartTime = min(Timestamp), EndTime = max(Timestamp) by IPAddress, DeviceName, bin(Timestamp, 5m)
-| where FailedAttempts >= 5
-| extend DetectionType = "Failed Logons by IP";
-
-// Failed attempts across multiple accounts (Credential stuffing)
-let multiAccountFailed = DeviceLogonEvents
-| where LogonResult == "Failure"
-| summarize AccountCount = dcount(AccountName), FailedAttempts = count() by IPAddress, DeviceName, bin(Timestamp, 5m)
-| where AccountCount > 5 and FailedAttempts > 10
-| extend DetectionType = "Multi-Account Failed Attempts";
-
-// Successful login after failures
-let failedLogons = DeviceLogonEvents
-    | where LogonResult == "Failure"
-    | summarize FailedCount = count() by AccountName, DeviceName, bin(Timestamp, 10m);
-let successAfterFailure = DeviceLogonEvents
-| where LogonResult == "Success"
-| join kind=inner (failedLogons) on AccountName, DeviceName
-| where Timestamp between (failedLogons.Timestamp .. failedLogons.Timestamp + 10m)
-| extend DetectionType = "Success After Failures"
-| project Timestamp, AccountName, DeviceName, FailedCount, DetectionType;
-
-// Rapid logons
-let rapidLogons = DeviceLogonEvents
-| sort by AccountName asc, Timestamp asc
-| extend PrevTimestamp = prev(Timestamp)
-| extend TimeDiff = datetime_diff('second', Timestamp, PrevTimestamp)
-| where TimeDiff >= 0 and TimeDiff < 3
-| extend DetectionType = "Rapid Logons"
-| project Timestamp, AccountName, DeviceName, TimeDiff, DetectionType;
-
-// Union all detections
-failedByUser
-| project Timestamp=StartTime, AccountName, DeviceName, FailedAttempts, DetectionType
-| union (failedByIP | project Timestamp=StartTime, IPAddress, DeviceName, FailedAttempts, DetectionType)
-| union (multiAccountFailed | project Timestamp=StartTime, IPAddress, DeviceName, AccountCount, FailedAttempts, DetectionType)
-| union successAfterFailure
-| union rapidLogons
-| order by Timestamp desc
+// T1082 - System Information Discovery
+// Detects system profiling tool use on endpoints
+DeviceProcessEvents
+| where FileName in ("systeminfo.exe", "hostname.exe")
+| project Timestamp, DeviceName, ProcessCommandLine
